@@ -18,12 +18,13 @@ namespace Client
     public class ClientFactory
     {
         /// <summary>
-        /// Creates a new instance of the <see cref="Client"/> class.
+        /// Creates a new instance of the <see cref="MvgClient"/> class.
         /// </summary>
-        /// <returns>The <see cref="Client"/> instance.</returns>
-        public virtual IClient CreateClient()
+        /// <returns>The <see cref="MvgClient"/> instance.</returns>
+        public virtual IClient CreateMvgClient()
         {
-            return new Client();
+            return new MvgClient();
         }
     }
 }
+

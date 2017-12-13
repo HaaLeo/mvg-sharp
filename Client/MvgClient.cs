@@ -15,9 +15,9 @@ namespace Client
     using System.Text;
 
     /// <summary>
-    /// The client class.
+    /// The unofficial .NET client for the MVG web API.
     /// </summary>
-    public class Client : IClient
+    public class MvgClient : IClient
     {
         /// <summary>
         /// Gets all nearby stations for the given <paramref name="latitude"/> and <paramref name="longitude"/>.
