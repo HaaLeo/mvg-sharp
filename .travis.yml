@@ -1,2 +1,9 @@
 language: csharp
 solution: MVG_Sharp.sln
+ 
+ before_script:
+    - nuget restore MVG_Sharp.sln
+    - msbuild /t:Restore
+ 
+ script:
+    - msbuild MVG_Sharp.sln /p:configuration=Release /t:Clean;Rebuild /m
