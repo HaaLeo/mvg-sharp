@@ -8,7 +8,7 @@
 // </summary>
 // ----------------------------------------------------------------------------
 
-namespace API
+namespace Client
 {
     using System;
     using System.Collections.Generic;
