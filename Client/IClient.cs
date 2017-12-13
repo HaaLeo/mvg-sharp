@@ -11,8 +11,6 @@
 namespace Client
 {
     using System;
-    using System.Dynamic;
-    using System.Threading;
 
     /// <summary>
     /// The IClient interface.
