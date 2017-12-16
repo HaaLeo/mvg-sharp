@@ -8,6 +8,8 @@
 // </summary>
 // ----------------------------------------------------------------------------
 
+using System.Threading.Tasks;
+
 namespace Client
 {
     using System;
@@ -23,14 +25,13 @@ namespace Client
         /// <param name="latitude">The latitude.</param>
         /// <param name="longitude">The longitude.</param>
         /// <returns>A JSON string.</returns>
-        string GetNerbyStations(float latitude, float longitude);
+        Task<string> GetNerbyStations(double latitude, double longitude);
 
         /// <summary>
-        /// Gets the corresponding ID for the given <paramref name="stationName"/>.
+        /// Gets all available stations.
         /// </summary>
-        /// <param name="stationName">The station name.</param>
-        /// <returns>The station ID.</returns>
-        int GetIdForStation(string stationName);
+        /// <returns>A JSON string.</returns>
+        Task<string> GetAllStations();
 
         /// <summary>
         /// Gets all stations for the given <paramref name="location"/>.

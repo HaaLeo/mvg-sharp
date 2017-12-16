@@ -1,5 +1,5 @@
 ﻿// ----------------------------------------------------------------------------
-// <copyright file="Client.cs">
+// <copyright file="MvgClient.cs">
 //   Copyright (c) Leo Hanisch
 // </copyright>
 // <author>Leo Hanisch</author>
@@ -11,8 +11,9 @@
 namespace Client
 {
     using System;
-    using System.Collections.Generic;
-    using System.Text;
+    using System.Globalization;
+    using System.Net.Http;
+    using System.Threading.Tasks;
 
     /// <summary>
     /// The unofficial .NET client for the MVG web API.
@@ -20,24 +21,53 @@ namespace Client
     public class MvgClient : IClient
     {
         /// <summary>
+        /// The http client to perform API requests.
+        /// </summary>
+        private static HttpClient _client;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MvgClient"/> class.
+        /// </summary>
+        public MvgClient()
+        {
+            _client = new HttpClient();
+            _client.DefaultRequestHeaders.Clear();
+            _client.DefaultRequestHeaders.Add("X-MVG-Authorization-Key", "5af1beca494712ed38d313714d4caff6");
+            _client.BaseAddress = new Uri("https://www.mvg.de/fahrinfo/api/");
+        }
+
+        /// <summary>
         /// Gets all nearby stations for the given <paramref name="latitude"/> and <paramref name="longitude"/>.
         /// </summary>
         /// <param name="latitude">The latitude.</param>
         /// <param name="longitude">The longitude.</param>
         /// <returns>A JSON string.</returns>
-        public string GetNerbyStations(float latitude, float longitude)
+        public async Task<string> GetNerbyStations(double latitude, double longitude)
         {
-            throw new NotImplementedException();
+            if (latitude == 0)
+            {
+                throw new ArgumentException("The argument must not be zero.", nameof(latitude));
+            }
+
+            if (longitude == 0)
+            {
+                throw new ArgumentException("The argument must not be zero.", nameof(longitude));
+            }
+
+            return await _client.GetStringAsync(
+                "location/nearby?latitude="
+                + latitude.ToString(CultureInfo.InvariantCulture)
+                + "&longitude="
+                + longitude.ToString(CultureInfo.InvariantCulture));
         }
 
         /// <summary>
-        /// Gets the corresponding ID for the given <paramref name="stationName"/>.
+        /// Gets all available stations.
         /// </summary>
-        /// <param name="stationName">The station name.</param>
-        /// <returns>The station ID.</returns>
-        public int GetIdForStation(string stationName)
+        /// <returns>A JSON string.</returns>
+        public async Task<string> GetAllStations()
         {
-            throw new NotImplementedException();
+            return await _client.GetStringAsync("location/queryWeb?q=");
         }
 
         /// <summary>
@@ -47,6 +77,12 @@ namespace Client
         /// <returns>A JSON string.</returns>
         public string GetStationsForLocation(string location)
         {
+            if (string.IsNullOrEmpty(location))
+            {
+                throw new ArgumentException("The value must not be null or empty.", nameof(location));
+            }
+
+            //// Todo: Add api call
             throw new NotImplementedException();
         }
 
