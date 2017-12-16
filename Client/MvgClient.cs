@@ -8,6 +8,8 @@
 // </summary>
 // ----------------------------------------------------------------------------
 
+using System.Collections.Generic;
+
 namespace Client
 {
     using System;
@@ -33,7 +35,7 @@ namespace Client
             _client = new HttpClient();
             _client.DefaultRequestHeaders.Clear();
             _client.DefaultRequestHeaders.Add("X-MVG-Authorization-Key", "5af1beca494712ed38d313714d4caff6");
-            _client.BaseAddress = new Uri("https://www.mvg.de/fahrinfo/api/");
+            _client.BaseAddress = new Uri("https://www.mvg.de/");
         }
 
         /// <summary>
@@ -55,7 +57,7 @@ namespace Client
             }
 
             return await _client.GetStringAsync(
-                "location/nearby?latitude="
+                "fahrinfo/api/location/nearby?latitude="
                 + latitude.ToString(CultureInfo.InvariantCulture)
                 + "&longitude="
                 + longitude.ToString(CultureInfo.InvariantCulture));
@@ -67,23 +69,22 @@ namespace Client
         /// <returns>A JSON string.</returns>
         public async Task<string> GetAllStations()
         {
-            return await _client.GetStringAsync("location/queryWeb?q=");
+            return await _client.GetStringAsync("fahrinfo/api/location/queryWeb?q=");
         }
 
         /// <summary>
-        /// Gets all stations for the given <paramref name="location"/>.
+        /// Gets all stations or addresses for the given <paramref name="location"/>.
         /// </summary>
         /// <param name="location">The location. For example a street or a station name.</param>
         /// <returns>A JSON string.</returns>
-        public string GetStationsForLocation(string location)
+        public async Task<string> GetStations(string location)
         {
             if (string.IsNullOrEmpty(location))
             {
                 throw new ArgumentException("The value must not be null or empty.", nameof(location));
             }
 
-            //// Todo: Add api call
-            throw new NotImplementedException();
+            return await _client.GetStringAsync("fahrinfo/api/location/queryWeb?q=" + location);
         }
 
         /// <summary>
@@ -96,7 +97,7 @@ namespace Client
         /// <param name="maxWalkTimeToStart">The maximum walking time to the departure.</param>
         /// <param name="maxWalkTimeToDest">The maximum walking time to the destination.</param>
         /// <returns>A JSON string.</returns>
-        public string GetRoute(
+        public async Task<string> GetRoute(
             int startId,
             int destId,
             DateTime? time = null,
@@ -104,7 +105,49 @@ namespace Client
             int maxWalkTimeToStart = 0,
             int maxWalkTimeToDest = 0)
         {
-            throw new NotImplementedException();
+            if (startId <= 0)
+            {
+                throw new ArgumentException("The value must be greater than 0.", nameof(startId));
+            }
+
+            if (destId <= 0)
+            {
+                throw new ArgumentException("The value must be greater than 0.", nameof(destId));
+            }
+
+            if (maxWalkTimeToDest < 0)
+            {
+                throw new ArgumentException("The value must be zero or greater.", nameof(maxWalkTimeToDest));
+            }
+
+            if (maxWalkTimeToStart < 0)
+            {
+                throw new ArgumentException("The value must be zero or greater.", nameof(maxWalkTimeToStart));
+            }
+
+            var options = new List<string>
+            {
+                // Settings for start and destination
+                "fromStation=" + startId,
+                "toStation=" + destId
+            };
+
+            // Settings for time
+            var dto = time != null ? new DateTimeOffset((DateTime)time) : new DateTimeOffset(DateTime.Now);
+            var unixSeconds = dto.ToUnixTimeMilliseconds();
+            options.Add("time=" + unixSeconds);
+
+            // Is given time arrival time?
+            if (isArrivalTime)
+            {
+                options.Add("arrival=true");
+            }
+
+            // Settings for footway travel time
+            options.Add("maxTravelTimeFootwayToStation=" + maxWalkTimeToStart);
+            options.Add("maxTravelTimeFootwayToDestination=" + maxWalkTimeToDest);
+
+            return await _client.GetStringAsync("fahrinfo/api/routing/?" + string.Join("&", options));
         }
 
         /// <summary>
@@ -112,18 +155,23 @@ namespace Client
         /// </summary>
         /// <param name="stationId">The station ID.</param>
         /// <returns>A JSON string.</returns>
-        public string GetDepartures(int stationId)
+        public async Task<string> GetDepartures(int stationId)
         {
-            throw new NotImplementedException();
+            if (stationId <= 0)
+            {
+                throw new ArgumentException("The value must be greater than 0", nameof(stationId));
+            }
+
+            return await _client.GetStringAsync("fahrinfo/api/departure/" + stationId + "?footway=0");
         }
 
         /// <summary>
         /// Gets all current interuptions.
         /// </summary>
         /// <returns>A JSON string.</returns>
-        public string GetInteruptions()
+        public async Task<string> GetInteruptions()
         {
-            throw new NotImplementedException();
+            return await _client.GetStringAsync(".rest/betriebsaenderungen/api/interruptions");
         }
     }
 }
