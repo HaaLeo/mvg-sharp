@@ -8,17 +8,26 @@
 // </summary>
 // ----------------------------------------------------------------------------
 
-using System.Threading.Tasks;
-
 namespace Client
 {
     using System;
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
+
+    using Client.DataStructure;
 
     /// <summary>
     /// The IClient interface.
     /// </summary>
     public interface IClient
     {
+        /// <summary>
+        /// Gets the unique ID for the given <paramref name="stationName"/>.
+        /// </summary>
+        /// <param name="stationName">The station name.</param>
+        /// <returns>The station ID.</returns>
+        Task<int> GetStationId(string stationName);
+
         /// <summary>
         /// Gets all nearby stations for the given <paramref name="latitude"/> and <paramref name="longitude"/>.
         /// </summary>
@@ -31,14 +40,14 @@ namespace Client
         /// Gets all available stations.
         /// </summary>
         /// <returns>A JSON string.</returns>
-        Task<string> GetAllStations();
+        Task<IEnumerable<Station>> GetAllStations();
 
         /// <summary>
         /// Gets all stations for the given <paramref name="location"/>.
         /// </summary>
         /// <param name="location">The location. For example a street or a station name.</param>
         /// <returns>A JSON string.</returns>
-        Task<string> GetStations(string location);
+        Task<IEnumerable<Station>> GetStations(string location);
 
         /// <summary>
         /// Gets the route from the given <paramref name="startId"/> to the <paramref name="destId"/> at a given <paramref name="time"/>.

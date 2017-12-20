@@ -8,14 +8,18 @@
 // </summary>
 // ----------------------------------------------------------------------------
 
-using System.Collections.Generic;
-
 namespace Client
 {
     using System;
+    using System.Collections.Generic;
     using System.Globalization;
+    using System.Linq;
     using System.Net.Http;
     using System.Threading.Tasks;
+    
+    using Client.DataStructure;
+
+    using Newtonsoft.Json;
 
     /// <summary>
     /// The unofficial .NET client for the MVG web API.
@@ -36,6 +40,22 @@ namespace Client
             _client.DefaultRequestHeaders.Clear();
             _client.DefaultRequestHeaders.Add("X-MVG-Authorization-Key", "5af1beca494712ed38d313714d4caff6");
             _client.BaseAddress = new Uri("https://www.mvg.de/");
+        }
+
+        /// <summary>
+        /// Gets the unique ID for the given <paramref name="stationName"/>.
+        /// </summary>
+        /// <param name="stationName">The station name.</param>
+        /// <returns>The station ID or 0.</returns>
+        public async Task<int> GetStationId(string stationName)
+        {
+            if (string.IsNullOrEmpty(stationName))
+            {
+                throw new ArgumentException("The value must not be null or empty.", nameof(stationName));
+            }
+
+            var stations = await this.GetStations(stationName);
+            return stations.FirstOrDefault(station => station.Name == stationName).Id;
         }
 
         /// <summary>
@@ -67,9 +87,10 @@ namespace Client
         /// Gets all available stations.
         /// </summary>
         /// <returns>A JSON string.</returns>
-        public async Task<string> GetAllStations()
+        public async Task<IEnumerable<Station>> GetAllStations()
         {
-            return await _client.GetStringAsync("fahrinfo/api/location/queryWeb?q=");
+            var response = await _client.GetStringAsync("fahrinfo/api/location/queryWeb?q=");
+            return JsonConvert.DeserializeObject<LocationsSink>(response).Locations;
         }
 
         /// <summary>
@@ -77,14 +98,15 @@ namespace Client
         /// </summary>
         /// <param name="location">The location. For example a street or a station name.</param>
         /// <returns>A JSON string.</returns>
-        public async Task<string> GetStations(string location)
+        public async Task<IEnumerable<Station>> GetStations(string location)
         {
             if (string.IsNullOrEmpty(location))
             {
                 throw new ArgumentException("The value must not be null or empty.", nameof(location));
             }
 
-            return await _client.GetStringAsync("fahrinfo/api/location/queryWeb?q=" + location);
+            var response = await _client.GetStringAsync("fahrinfo/api/location/queryWeb?q=" + location);
+            return JsonConvert.DeserializeObject<LocationsSink>(response).Locations;
         }
 
         /// <summary>

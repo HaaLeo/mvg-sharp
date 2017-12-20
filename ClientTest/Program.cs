@@ -12,7 +12,7 @@ namespace ClientTest
         static void Main(string[] args)
         {
             IClient apiClient = new MvgClient();
-            var result = apiClient.GetRoute(1,2).Result;
+            var result = apiClient.GetAllStations().Result;
         }
     }
 }
