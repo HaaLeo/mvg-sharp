@@ -29,6 +29,13 @@ namespace Client
         Task<int> GetStationId(string stationName);
 
         /// <summary>
+        /// Checks if a station with the given <paramref name="stationName"/> exists.
+        /// </summary>
+        /// <param name="stationName">The station's name.</param>
+        /// <returns>True if the station exists, otherwise false.</returns>
+        Task<bool> StationExists(string stationName);
+
+        /// <summary>
         /// Gets all nearby stations for the given <paramref name="latitude"/> and <paramref name="longitude"/>.
         /// </summary>
         /// <param name="latitude">The latitude.</param>
@@ -48,6 +55,13 @@ namespace Client
         /// <param name="location">The location. For example a street or a station name.</param>
         /// <returns>A JSON string.</returns>
         Task<IEnumerable<Station>> GetStations(string location);
+
+        /// <summary>
+        /// Gets the first station that matches the <paramref name="stationName"/> name.
+        /// </summary>
+        /// <param name="stationName">The station name.</param>
+        /// <returns>The corresponding station.</returns>
+        Task<Station> GetStation(string stationName);
 
         /// <summary>
         /// Gets the route from the given <paramref name="startId"/> to the <paramref name="destId"/> at a given <paramref name="time"/>.

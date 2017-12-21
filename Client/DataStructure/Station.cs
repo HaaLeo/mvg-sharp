@@ -23,13 +23,13 @@ namespace Client.DataStructure
         /// Gets or sets the latitude.
         /// </summary>
         [JsonProperty("latitude")]
-        public float Latitude { get; set; }
+        public double Latitude { get; set; }
 
         /// <summary>
         /// Gets or sets the longitude
         /// </summary>
         [JsonProperty("longitude")]
-        public float Longitude { get; set; }
+        public double Longitude { get; set; }
 
         /// <summary>
         /// Gets or sets the unique ID.

@@ -59,6 +59,22 @@ namespace Client
         }
 
         /// <summary>
+        /// Checks if a station with the given <paramref name="stationName"/> exists.
+        /// </summary>
+        /// <param name="stationName">The station's name.</param>
+        /// <returns>True if the station exists, otherwise false.</returns>
+        public async Task<bool> StationExists(string stationName)
+        {
+            if (string.IsNullOrEmpty(stationName))
+            {
+                throw new ArgumentException("The value must not be null or empty.", nameof(stationName));
+            }
+
+            var foundStations = await this.GetStations(stationName);
+            return foundStations.Any(station => stationName == station.Name);
+        }
+
+        /// <summary>
         /// Gets all nearby stations for the given <paramref name="latitude"/> and <paramref name="longitude"/>.
         /// </summary>
         /// <param name="latitude">The latitude.</param>
@@ -94,7 +110,7 @@ namespace Client
         }
 
         /// <summary>
-        /// Gets all stations or addresses for the given <paramref name="location"/>.
+        /// Gets all stations or addresses that contain the given <paramref name="location"/> name.
         /// </summary>
         /// <param name="location">The location. For example a street or a station name.</param>
         /// <returns>A JSON string.</returns>
@@ -107,6 +123,22 @@ namespace Client
 
             var response = await _client.GetStringAsync("fahrinfo/api/location/queryWeb?q=" + location);
             return JsonConvert.DeserializeObject<LocationsSink>(response).Locations;
+        }
+
+        /// <summary>
+        /// Gets the first station that matches the <paramref name="stationName"/> name.
+        /// </summary>
+        /// <param name="stationName">The station name.</param>
+        /// <returns>The corresponding station, or throws an <see cref="InvalidOperationException"/>.</returns>
+        public async Task<Station> GetStation(string stationName)
+        {
+            if (string.IsNullOrEmpty(stationName))
+            {
+                throw new ArgumentException("The value must not be null or empty.", nameof(stationName));
+            }
+
+            var foundStations = await this.GetStations(stationName);
+            return foundStations.First(station => station.Name == stationName);
         }
 
         /// <summary>
